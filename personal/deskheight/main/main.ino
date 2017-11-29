@@ -30,11 +30,15 @@ const int   WIFI_STATUS_LED_PIN    = D6;  // LED that is used to convey wifi con
 // HTTP
 String      HTTP_HOST              = SECRET_HTTP_HOST;
 const int   HTTP_PORT              = SECRET_HTTP_PORT;
-String      HTTP_URI               = "stats/deskheight";
+const char* HTTP_USER              = SECRET_HTTP_USER;
+const char* HTTP_PASSWORD          = SECRET_HTTP_PASSWORD;
+String      HTTP_URI               = "/sensors/deskheight"; // leading slash is required
 
 // MISC
 const int   LOOP_INTERVAL_MSEC     = 5000; // How often do we measure desk height
-const int   LED_STATUS_PIN         = D7;  // LED pin that is used to blink on success
+const int   HTTP_LED_SUCCESS_PIN   = D7;   // LED pin that is used to blink on http success
+const int   HTTP_LED_ERROR_PIN     = D10;  // LED pin that is used to blink on http success
+
 // --------------------------------------------------------------
 
 // With Wemos D1, use the provided constants, like D3 (and not 3) because the actual numbers are different
@@ -107,7 +111,8 @@ void setup(){
   Serial.begin(115200);
   Serial.println("Starting...");
   pinMode(WIFI_STATUS_LED_PIN, OUTPUT);
-  pinMode(LED_STATUS_PIN, OUTPUT);
+  pinMode(HTTP_LED_SUCCESS_PIN, OUTPUT);
+  pinMode(HTTP_LED_ERROR_PIN, OUTPUT);
   connectToWifi();
 }
 
@@ -118,14 +123,22 @@ void loop(){
     const int deskheight = ultrasonic.distanceRead();
     Serial.printf("Desk height: %d CM\n", deskheight);
 
-    Serial.printf("Sending desk height of '%d' to %s:%i/%s\n", deskheight, HTTP_HOST.c_str(), HTTP_PORT, HTTP_URI.c_str());
+    Serial.printf("Sending desk height of '%d' to %s:%i%s\n", deskheight, HTTP_HOST.c_str(), HTTP_PORT, HTTP_URI.c_str());
 
     // Create http client
+    // https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266HTTPClient/
     HTTPClient http;
     http.begin(HTTP_HOST, HTTP_PORT, HTTP_URI);
-    http.addHeader("User-Agent", "Desk height sensor - Wemos D1");
+    http.setAuthorization(HTTP_USER, HTTP_PASSWORD);
+    
+    http.setUserAgent("Deskheight sensor - Wemos D1");
+    http.addHeader("content-type", "application/json");
 
-    int httpCode = http.POST(String(deskheight));
+    // '{"value": "<deskheight>", "homeassistant_sensor": { "name": "deskheight", "state": "<deskheight>", "attributes": { "friendly_name": "Desk Height", "unit_of_measurement": "cm" }}}'
+    String payload = String("{ \"value\": \"") + deskheight + String("\", \"homeassistant_sensor\": { \"name\": \"deskheight\",\"state\": \"") + deskheight + String("\", \"attributes\": { \"friendly_name\": \"Desk Height\", \"unit_of_measurement\": \"cm\" }}}");
+
+    int httpCode = http.POST(payload);
+    int statusLed = HTTP_LED_ERROR_PIN;
 
     // httpCode will be negative on error
     if(httpCode > 0) {
@@ -136,6 +149,7 @@ void loop(){
         if(httpCode == HTTP_CODE_OK) {
             String payload = http.getString();
             Serial.println(payload);
+            statusLed = HTTP_LED_SUCCESS_PIN;
         }
     } else {
         Serial.printf("[HTTP] POST... failed, error: %s\n", http.errorToString(httpCode).c_str());
@@ -145,10 +159,10 @@ void loop(){
 
     Serial.printf("Next loop in %d msec", LOOP_INTERVAL_MSEC);
 
-    // Blink success led
-    digitalWrite(LED_STATUS_PIN, HIGH);
+    // Blink led
+    digitalWrite(statusLed, HIGH);
     delay(500);
-    digitalWrite(LED_STATUS_PIN, LOW);
+    digitalWrite(statusLed, LOW);
 
     delay(LOOP_INTERVAL_MSEC);
 
