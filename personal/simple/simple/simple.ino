@@ -1,3 +1,6 @@
+// Blinks an LED. Ideal if starting out after a while.
+
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);

@@ -14,16 +14,14 @@ void setup() {
   lcd.print("Foo");
   lcd.setCursor(0,1);
   lcd.print("Bar");
-  // put your setup code here, to run once:
-
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:  
+  // put your main code here, to run repeatedly:
   if (Serial.available() > 0) {
       String str = Serial.readStringUntil('\n');
       lcd.clear();
-      lcd.print(str);      
+      lcd.print(str);
       Serial.println(str);
   } else {
        Serial.println("no data");

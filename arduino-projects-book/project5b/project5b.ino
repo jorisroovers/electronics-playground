@@ -29,7 +29,7 @@ void handleButtonPress(){
         Serial.print("button state: ");
         Serial.println(STATE);
     }
-    buttonPressed = true;     
+    buttonPressed = true;
   } else {
     buttonPressed = false;
   }
@@ -43,7 +43,7 @@ void loop() {
      myServo.write(0);
   }
   delay(50);
-  
+
   // put your main code here, to run repeatedly:
 
 }
