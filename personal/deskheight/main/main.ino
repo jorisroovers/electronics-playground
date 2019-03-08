@@ -120,8 +120,14 @@ void setup(){
 void loop(){
     ensureWifiConnection();
 
-    const int deskheight = ultrasonic.distanceRead();
-    Serial.printf("Desk height: %d CM\n", deskheight);
+    // Determine desk height
+    // We do very basic signal smoothing by measuring twice and taking the max
+    const int deskheightRaw1 = ultrasonic.distanceRead();
+    delay(300);
+    const int deskheightRaw2 = ultrasonic.distanceRead();
+    const int deskheight = _max(deskheightRaw1, deskheightRaw2); // Use _max() instead of max(): https://github.com/esp8266/Arduino/issues/2073
+
+    Serial.printf("Desk height: %d CM (raw1: %d CM, raw2: %d CM)\n", deskheight, deskheightRaw1, deskheightRaw2);
 
     Serial.printf("Sending desk height of '%d' to %s:%i%s\n", deskheight, HTTP_HOST.c_str(), HTTP_PORT, HTTP_URI.c_str());
 
@@ -130,7 +136,7 @@ void loop(){
     HTTPClient http;
     http.begin(HTTP_HOST, HTTP_PORT, HTTP_URI);
     http.setAuthorization(HTTP_USER, HTTP_PASSWORD);
-    
+
     http.setUserAgent("Deskheight sensor - Wemos D1");
     http.addHeader("content-type", "application/json");
 
@@ -157,7 +163,7 @@ void loop(){
 
     http.end();
 
-    Serial.printf("Next loop in %d msec", LOOP_INTERVAL_MSEC);
+    Serial.printf("Next loop in %d msec \n", LOOP_INTERVAL_MSEC);
 
     // Blink led
     digitalWrite(statusLed, HIGH);
