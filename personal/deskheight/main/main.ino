@@ -121,13 +121,17 @@ void loop(){
     ensureWifiConnection();
 
     // Determine desk height
-    // We do very basic signal smoothing by measuring twice and taking the max
+    // We do very basic signal smoothing by measuring three times and taking the max
     const int deskheightRaw1 = ultrasonic.distanceRead();
-    delay(300);
+    delay(150);
     const int deskheightRaw2 = ultrasonic.distanceRead();
-    const int deskheight = _max(deskheightRaw1, deskheightRaw2); // Use _max() instead of max(): https://github.com/esp8266/Arduino/issues/2073
+    delay(150);
+    const int deskheightRaw3 = ultrasonic.distanceRead();
+    
+    int deskheight = _max(deskheightRaw1, deskheightRaw2); // Use _max() instead of max(): https://github.com/esp8266/Arduino/issues/2073
+    deskheight = _max(deskheight, deskheightRaw3);
 
-    Serial.printf("Desk height: %d CM (raw1: %d CM, raw2: %d CM)\n", deskheight, deskheightRaw1, deskheightRaw2);
+    Serial.printf("Desk height: %d CM (raw1: %d CM, raw2: %d CM, raw3: %d CM)\n", deskheight, deskheightRaw1, deskheightRaw2, deskheightRaw3) ;
 
     Serial.printf("Sending desk height of '%d' to %s:%i%s\n", deskheight, HTTP_HOST.c_str(), HTTP_PORT, HTTP_URI.c_str());
 
