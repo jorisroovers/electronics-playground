@@ -1,0 +1,23 @@
+EESchema-LIBRARY Version 2.4
+#encoding utf-8
+#
+# JQC-3FF-S-Z
+#
+DEF JQC-3FF-S-Z K 0 40 Y Y 1 F N
+F0 "K" 0 0 50 H V C CNN
+F1 "JQC-3FF-S-Z" 0 0 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+T 0 0 -250 50 0 0 0 Relay Normal 0 C C
+S -250 -100 250 -400 0 1 0 N
+X + ~ -350 -350 100 R 50 50 1 1 I
+X - ~ -350 -300 100 R 50 50 1 1 I
+X COM ~ 250 -250 100 R 50 50 1 1 O
+X NC ~ 250 -150 100 R 50 50 1 1 O
+X NO ~ 250 -350 100 R 50 50 1 1 O
+X S ~ -350 -250 100 R 50 50 1 1 I
+ENDDRAW
+ENDDEF
+#
+#End Library
