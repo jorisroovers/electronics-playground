@@ -2,3 +2,5 @@
 *.pyc
 # Never include secrets.h files, so we don't accidentally upload passwords
 secrets.h
+
+.esphome

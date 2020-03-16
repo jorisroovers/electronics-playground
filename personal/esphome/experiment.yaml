@@ -1,0 +1,47 @@
+esphome:
+  name: experiment
+  platform: ESP8266
+  board: d1_mini # optional, only affects pin layout
+
+wifi:
+  ssid: "<redacted>"
+  password: "<redacted>"
+  manual_ip:
+    static_ip: 192.168.1.248
+    gateway: 192.168.1.1
+    subnet: 255.255.255.0
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Experiment Fallback Hotspot"
+    password: "<redacted>"
+
+switch:
+  - platform: gpio
+    name: "LED PIN D5"
+    pin: D5
+
+  - platform: gpio
+    name: "LED PIN D4"
+    pin: D4
+
+  - platform: gpio
+    name: "LED PIN D3"
+    pin: D3
+
+  - platform: gpio
+    name: "LED PIN D2"
+    pin: D2
+
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: "foobar"
+
+ota:
+  password: "foobar"
