@@ -1,38 +1,34 @@
-#include <Servo.h>
 
-Servo myServo;
-int angle = 0;
-// TODO: remove when using WEMOS D1
-int D4 = 4;
-int D9 = 9;
-int D2 = 2;
+const int  BTN_OPEN_INPUT_PIN      = D2;
+const int  BTN_CLOSE_INPUT_PIN     = D4;
+const int  RELAY_OPEN_OUTPUT_PIN   = D10;
+const int  RELAY_CLOSE_OUTPUT_PIN  = D12;
 
-void setup(){
-  myServo.attach(D9);
-  Serial.begin(115200);
-  Serial.println("Starting...");
-//   pinMode(WIFI_STATUS_LED_PIN, OUTPUT);
-//   pinMode(HTTP_LED_SUCCESS_PIN, OUTPUT);
-   pinMode(D4, INPUT);
-   pinMode(D2, INPUT);
-//   connectToWifi();
-  
-  myServo.write(angle);
+
+
+void setup()
+{
+    pinMode(BTN_OPEN_INPUT_PIN, INPUT);
+    pinMode(BTN_CLOSE_INPUT_PIN, INPUT);
+    pinMode(RELAY_OPEN_OUTPUT_PIN, OUTPUT);
+    pinMode(RELAY_CLOSE_OUTPUT_PIN, OUTPUT);
+
 }
 
-void loop(){
-  Serial.print("LOOP2: ");
-  int goUp = digitalRead(D4);
-  int goDown = digitalRead(D2);
-  if (goUp == HIGH && angle < 179) {
-    angle = min(angle+1, 179);
-    myServo.write(angle);
-  } else if (goDown == HIGH && angle > 0) {
-    angle = max(angle-1, 0);
-    myServo.write(angle);
-  }
-  Serial.print(" ");
-  Serial.println(angle);
-  delay(20);
+void loop()
+{
+    if (digitalRead(BTN_OPEN_INPUT_PIN) == HIGH && digitalRead(BTN_CLOSE_INPUT_PIN) == LOW) // Extend actuator
+    {
+        digitalWrite(RELAY_OPEN_OUTPUT_PIN, HIGH);
+        digitalWrite(RELAY_CLOSE_OUTPUT_PIN, LOW);
+    } else if (digitalRead(BTN_OPEN_INPUT_PIN) == LOW && digitalRead(BTN_CLOSE_INPUT_PIN) == HIGH) { // Retract actuator
+        digitalWrite(RELAY_OPEN_OUTPUT_PIN, LOW);
+        digitalWrite(RELAY_CLOSE_OUTPUT_PIN, HIGH);
+    } else {
+      // both buttons are pressed or unpressed at the same time -> don't switch any relay.
+      // NOTE: we don't want to switch both relays when both buttons are pressed to avoid a short-circuit
+        digitalWrite(RELAY_OPEN_OUTPUT_PIN, LOW);
+        digitalWrite(RELAY_CLOSE_OUTPUT_PIN, LOW);
+    }
+    delay(100);
 }
-
