@@ -2,15 +2,19 @@
 ########################################################################################################################
 # General ESPHome config                                                                                               #
 ########################################################################################################################
+substitutions:
+  deviceid: bedroom_window
+  devicename: "Bedroom Window"
+
 esphome:
-  name: window_opener
+  name: ${deviceid}
   platform: ESP8266
   board: d1 # optional, only affects pin layout
   # on boot: close both relays (so we don't have any shenanigans when power cycling)
   on_boot:
     then:
-      - switch.turn_off: open_relay
-      - switch.turn_off: close_relay
+      - switch.turn_off: ${deviceid}_open_relay
+      - switch.turn_off: ${deviceid}_close_relay
 
 wifi:
   ssid: !secret wifi_ssid
@@ -49,56 +53,65 @@ ota:
 # RELAYS
 switch:
   - platform: gpio
-    name: "Open Relay"
-    id: open_relay
+    name: "$devicename Open Relay"
+    id: ${deviceid}_open_relay
     pin: D10
     # if we turn on this relay, automatically turn off the other one.
     # Required for when switching from home-assistant.
     on_turn_on:
       - then:
-          - switch.turn_off: close_relay
+          - switch.turn_off: ${deviceid}_close_relay
 
   - platform: gpio
-    name: "Close Relay"
-    id: close_relay
+    name: "$devicename Close Relay"
+    id: ${deviceid}_close_relay
     pin: D8
     on_turn_on:
       - then:
-          - switch.turn_off: open_relay
+          - switch.turn_off: ${deviceid}_open_relay
 
-# BUTTONS
+# REED SENSOR & BUTTONS
 binary_sensor:
   - platform: gpio
-    name: "Open Button"
+    name: "$devicename Window Status"
+    id: ${deviceid}_status
     pin: D2
+    filters:
+      - invert: # magnet detected => 'off' (window closed), no magnet => 'on' (window open)
+
+  - platform: gpio
+    name: "$devicename Open Button"
+    id: ${deviceid}_open_button
+    pin: D3
     on_press:
       then:
         # turn off the other relay, but double check (=if) before turning on this one to ensure we don't turn them
         # on at the same time.
-        - switch.turn_off: close_relay
+        - switch.turn_off: ${deviceid}_close_relay
         - if:
             condition:
-              switch.is_off: close_relay
+              switch.is_off: ${deviceid}_close_relay
             then:
-              - switch.turn_on: open_relay
+              - switch.turn_on: ${deviceid}_open_relay
    # on_release: turn both relays off, this is just an extra safety to avoid having both relays on at the same time.
     on_release:
       then:
-        - switch.turn_off: open_relay
-        - switch.turn_off: close_relay
+        - switch.turn_off: ${deviceid}_open_relay
+        - switch.turn_off: ${deviceid}_close_relay
 
   - platform: gpio
-    name: "Close Button"
+    name: "$devicename Close Button"
+    id: ${deviceid}_close_button
     pin: D4
     on_press:
       then:
-        - switch.turn_off: open_relay
+        - switch.turn_off: ${deviceid}_open_relay
         - if:
             condition:
-              switch.is_off: open_relay
+              switch.is_off: ${deviceid}_open_relay
             then:
-              - switch.turn_on: close_relay
+              - switch.turn_on: ${deviceid}_close_relay
     on_release:
       then:
-        - switch.turn_off: open_relay
-        - switch.turn_off: close_relay
+        - switch.turn_off: ${deviceid}_open_relay
+        - switch.turn_off: ${deviceid}_close_relay
