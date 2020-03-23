@@ -3,8 +3,8 @@
 # General ESPHome config                                                                                               #
 ########################################################################################################################
 substitutions:
-  deviceid: bedroom_window
-  devicename: "Bedroom Window"
+  deviceid: !secret deviceid
+  devicename: !secret devicename
 
 esphome:
   name: ${deviceid}
@@ -50,39 +50,19 @@ ota:
 # - If homeassistant changes the relay states while a button is pressed, releasing the button will automatically cancel
 #   the signal coming from homeassistant. This is a good safety.
 
-# RELAYS
-switch:
-  - platform: gpio
-    name: "$devicename Open Relay"
-    id: ${deviceid}_open_relay
-    pin: D10
-    # if we turn on this relay, automatically turn off the other one.
-    # Required for when switching from home-assistant.
-    on_turn_on:
-      - then:
-          - switch.turn_off: ${deviceid}_close_relay
-
-  - platform: gpio
-    name: "$devicename Close Relay"
-    id: ${deviceid}_close_relay
-    pin: D8
-    on_turn_on:
-      - then:
-          - switch.turn_off: ${deviceid}_open_relay
-
-# REED SENSOR & BUTTONS
+# INPUTS: REED SENSOR & BUTTONS
 binary_sensor:
   - platform: gpio
     name: "$devicename Window Status"
     id: ${deviceid}_status
-    pin: D2
+    pin: 4 # D2
     filters:
       - invert: # magnet detected => 'off' (window closed), no magnet => 'on' (window open)
 
   - platform: gpio
     name: "$devicename Open Button"
     id: ${deviceid}_open_button
-    pin: D3
+    pin: 4 # D1
     on_press:
       then:
         # turn off the other relay, but double check (=if) before turning on this one to ensure we don't turn them
@@ -102,7 +82,7 @@ binary_sensor:
   - platform: gpio
     name: "$devicename Close Button"
     id: ${deviceid}_close_button
-    pin: D4
+    pin: 5 # D2
     on_press:
       then:
         - switch.turn_off: ${deviceid}_open_relay
@@ -115,3 +95,23 @@ binary_sensor:
       then:
         - switch.turn_off: ${deviceid}_open_relay
         - switch.turn_off: ${deviceid}_close_relay
+
+# OUTPUTS: RELAYS
+switch:
+  - platform: gpio
+    name: "$devicename Open Relay"
+    id: ${deviceid}_open_relay
+    pin: 12 # D6, D5=14
+    # if we turn on this relay, automatically turn off the other one.
+    # Required for when switching from home-assistant.
+    on_turn_on:
+      - then:
+          - switch.turn_off: ${deviceid}_close_relay
+
+  - platform: gpio
+    name: "$devicename Close Relay"
+    id: ${deviceid}_close_relay
+    pin: 13 # D7
+    on_turn_on:
+      - then:
+          - switch.turn_off: ${deviceid}_open_relay
