@@ -52,12 +52,12 @@ ota:
 
 # INPUTS: REED SENSOR & BUTTONS
 binary_sensor:
-  - platform: gpio
-    name: "$devicename Window Status"
-    id: ${deviceid}_status
-    pin: 4 # D2
-    filters:
-      - invert: # magnet detected => 'off' (window closed), no magnet => 'on' (window open)
+#   - platform: gpio
+#     name: "$devicename Window Status"
+#     id: ${deviceid}_status
+#     pin: 4 # D2
+#     filters:
+#       - invert: # magnet detected => 'off' (window closed), no magnet => 'on' (window open)
 
   - platform: gpio
     name: "$devicename Open Button"
@@ -115,3 +115,16 @@ switch:
     on_turn_on:
       - then:
           - switch.turn_off: ${deviceid}_open_relay
+
+
+# TODO (important): Open switch that opens and stops after 2 seconds, so that 
+# switch:
+#   - platform: gpio
+#     name: "$devicename Open Window"
+#     id: ${deviceid}_open
+#     pin: 12 # D6, D5=14
+#     # if we turn on this relay, automatically turn off the other one.
+#     # Required for when switching from home-assistant.
+#     on_turn_on:
+#       - then:
+#           - switch.turn_off: ${deviceid}_close_relay

@@ -1,14 +1,20 @@
+# WindowOpener
+
+I built a custom PCB in a 3D-printed enclosure to control a motorized arm to automatically open and close my bedroom window. 
+All integrated with my existing home automation stack. For much more detail, read the related blog post.
+
+File structure:
+- `PCB/`: PCB related files in various formats. For easy editing, use the json file to import into [EasyEDA](https://easyeda.com/).
+- `esphome/`: [ESPHome](https://esphome.io/) config files
+- `CAD/`: CAD (3D) models of the enclosure and custom hinges that were 3D printed. I used [Fusion360](https://www.autodesk.com/products/fusion-360/personal).
+- `archive/`: various files related to prototyping and experimentation
+
+
+
+
 Programs: 
 - KiCad
 - Fritzing
-
-Todo:
-[ ] PCB
-[ ] Single power cable
-[ ] Enclosures
-[ ] Clean up Fritzing breadboard design
-[ ] Reed switch
-[ ] Home assistant automation
 
 # ESPHome
 
@@ -45,8 +51,6 @@ esphome esphome/window_opener.yaml run
 # Specify serial port
 esphome esphome/window_opener.yaml run --upload-port /dev/cu.usbserial-143230
 ```
-
-
 
 # Homeassistant integration
 Use the 'integrations' under homeassistant to connect the device.

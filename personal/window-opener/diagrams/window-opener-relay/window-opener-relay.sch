@@ -235,4 +235,19 @@ Wire Wire Line
 	5200 4050 5800 4050
 Wire Wire Line
 	5750 3900 5750 3600
+$Comp
+L window-opener-relay-rescue:R_US-Device R3
+U 1 1 5EC137EB
+P 1700 1450
+F 0 "R3" H 1768 1496 50  0000 L CNN
+F 1 "330 Ohm" H 1768 1405 50  0000 L CNN
+F 2 "" V 1740 1440 50  0001 C CNN
+F 3 "~" H 1700 1450 50  0001 C CNN
+	1    1700 1450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1700 1600 1700 1850
+Text Notes 2200 1600 0    50   ~ 0
+Used 560 Ohm since\nno 330 Ohm in inventory
 $EndSCHEMATC

@@ -2,7 +2,6 @@
 from time import sleep
 from machine import Pin
 
-
 while True:
     pin = Pin(4, Pin.OUT, value=1) # set pin high on creation
     sleep(1.0)
