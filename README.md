@@ -1,5 +1,5 @@
-# arduino-playground
-Collection of personal arduino projects
+# electronics-playground
+Collection of electronics related experiments
 
 # VSCode
 
