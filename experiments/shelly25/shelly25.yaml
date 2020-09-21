@@ -1,0 +1,62 @@
+esphome:
+  name: myshelly25
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  manual_ip:
+    static_ip: !secret wifi_static_ip
+    gateway: !secret wifi_gateway
+    subnet: !secret wifi_subnet
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: !secret wifi_fallback_ap_ssid
+    password: !secret wifi_fallback_ap_password
+
+api:
+
+logger:
+
+ota:
+
+switch:
+  - platform: gpio
+    id: shelly25_relay_1
+    name: Shelly 2.5 Relay1
+    pin: GPIO15
+    icon: "mdi:electric-switch"
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: gpio
+    id: shelly25_relay_2
+    name: Shelly 2.5 Relay2
+    pin: GPIO4
+    icon: "mdi:electric-switch"
+    restore_mode: RESTORE_DEFAULT_OFF
+
+# This exposes the Switching inputs as binary_sensors
+# It also ties the binary sensors to the relays: switching the relays on and off with the buttons
+# Note that this isn't default behavior, you have to program this yourself!
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO13
+    name: Switch1
+    on_press:
+      then:
+        - switch.toggle: shelly25_relay_1
+    on_release:
+      then:
+        - switch.turn_off: shelly25_relay_1
+  - platform: gpio
+    pin:
+      number: GPIO5
+    name: Switch2
+    on_press:
+      then:
+        - switch.toggle: shelly25_relay_2
+    on_release:
+      then:
+        - switch.turn_off: shelly25_relay_2
