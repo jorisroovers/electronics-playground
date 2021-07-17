@@ -4,5 +4,5 @@
 virtualenv .venv && source .venv/bin/activate
 pip install esphome
 
-esphome nodemcu.yaml run
+esphome run nodemcu.yaml
 ```
